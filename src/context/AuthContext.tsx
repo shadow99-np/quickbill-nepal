@@ -2,11 +2,18 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserAccount } from '@/lib/db';
+import { isFirebaseConfigured } from '@/lib/firebase';
+import {
+  firebaseSignInUser,
+  firebaseSignUpUser,
+  firebaseUpdateProfile
+} from '@/lib/firebaseService';
 
 interface AuthContextType {
   user: UserAccount | null;
   token: string | null;
   isLoading: boolean;
+  isFirebaseActive: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (data: {
     email: string;
@@ -59,6 +66,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
+    // 1. Try Firebase if configured and email is provided
+    if (isFirebaseConfigured && email.includes('@')) {
+      try {
+        const fbRes = await firebaseSignInUser(email, password);
+        if (fbRes.success && fbRes.user && fbRes.token) {
+          localStorage.setItem('quickbill_token', fbRes.token);
+          setToken(fbRes.token);
+          setUser(fbRes.user);
+          return { success: true };
+        } else if (!fbRes.success && fbRes.error !== 'Firebase is not configured.') {
+          return { success: false, error: fbRes.error };
+        }
+      } catch (err) {
+        console.warn('Firebase login attempt failed, falling back to local server:', err);
+      }
+    }
+
+    // 2. Fallback to built-in Cloud API
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -86,6 +111,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     phone?: string;
     address?: string;
   }) => {
+    // 1. Try Firebase if configured
+    if (isFirebaseConfigured) {
+      try {
+        const fbRes = await firebaseSignUpUser(formData);
+        if (fbRes.success && fbRes.user && fbRes.token) {
+          localStorage.setItem('quickbill_token', fbRes.token);
+          setToken(fbRes.token);
+          setUser(fbRes.user);
+          return { success: true };
+        } else if (!fbRes.success && fbRes.error !== 'Firebase is not yet configured with valid API keys.') {
+          return { success: false, error: fbRes.error };
+        }
+      } catch (err) {
+        console.warn('Firebase signup attempt failed, falling back to local server:', err);
+      }
+    }
+
+    // 2. Fallback to built-in Cloud API
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -125,6 +168,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateProfile = async (updates: Partial<UserAccount>): Promise<boolean> => {
     if (!token) return false;
+
+    // Sync to Firestore if user ID exists
+    if (isFirebaseConfigured && user?.id) {
+      firebaseUpdateProfile(user.id, updates).catch(() => {});
+    }
+
     try {
       const res = await fetch('/api/auth/me', {
         method: 'PUT',
@@ -151,6 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         token,
         isLoading,
+        isFirebaseActive: isFirebaseConfigured,
         login,
         signup,
         logout,

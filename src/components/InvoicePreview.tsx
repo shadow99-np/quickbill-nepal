@@ -29,11 +29,11 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoice }) => {
   const qrString = generateNepalQrString(invoice.payment, invoice.grandTotal);
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center overflow-x-auto">
       {/* A4 PAPER CANVAS (Level 2 Elevation: Pristine White, Fine Hairline, Layered Ambient Shadow) */}
       <div
         id="invoice-printable-sheet"
-        className="print-invoice-sheet w-full max-w-[720px] bg-white border border-slate-200 shadow-xl p-8 sm:p-10 text-slate-800 flex flex-col justify-between min-h-[980px] rounded-sm"
+        className="print-invoice-sheet w-full max-w-[720px] bg-white border border-slate-200 shadow-xl p-4 sm:p-8 md:p-10 text-slate-800 flex flex-col justify-between min-h-[980px] rounded-sm"
       >
         <div>
           {/* INVOICE TOP BANNER / TAX INVOICE HEADER */}
@@ -142,8 +142,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoice }) => {
           </div>
 
           {/* LINE ITEMS TABLE */}
-          <div className="mt-4">
-            <table className="w-full text-left border-collapse">
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[420px]">
               <thead>
                 <tr className="border-y-2 border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-900 bg-slate-50">
                   <th className="py-2 px-2 text-center w-8">S.N.</th>

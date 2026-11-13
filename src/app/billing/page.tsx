@@ -90,6 +90,7 @@ export default function Home() {
   const [isProOpen, setIsProOpen] = useState(false);
   const [historyInvoices, setHistoryInvoices] = useState<InvoiceData[]>([]);
   const [isSaved, setIsSaved] = useState(true);
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
 
   // Load from LocalStorage on mount
   useEffect(() => {
@@ -394,10 +395,36 @@ export default function Home() {
         {/* Google AdSense Slot (Real Monetization) */}
         <AdBanner onOpenPro={() => setIsProOpen(true)} />
 
+        {/* Mobile View Switcher (Visible only on mobile/tablet) */}
+        <div className="lg:hidden flex items-center p-1 bg-slate-200/90 rounded-xl mb-4 border border-slate-300 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setMobileTab('form')}
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              mobileTab === 'form'
+                ? 'bg-white text-emerald-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>✏️ 1. Edit Details</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('preview')}
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              mobileTab === 'preview'
+                ? 'bg-white text-emerald-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>📄 2. View A4 Bill & QR</span>
+          </button>
+        </div>
+
         {/* 2-Column Split: Form (Left) & Live Preview Canvas (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT: FORM ENGINE (Cols 1-6) */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className={`lg:col-span-6 space-y-6 ${mobileTab === 'form' ? 'block' : 'hidden lg:block'}`}>
             <InvoiceForm
               invoice={invoice}
               onChange={handleInvoiceChange}
@@ -406,7 +433,7 @@ export default function Home() {
           </div>
 
           {/* RIGHT: LIVE PREVIEW (Cols 7-12) */}
-          <div className="lg:col-span-6 sticky top-20">
+          <div className={`lg:col-span-6 sticky top-20 ${mobileTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
             <div className="no-print flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './tailwind.css';
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -17,14 +17,22 @@ export const metadata: Metadata = {
   ],
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className="h-full antialiased overflow-x-hidden">
+      <body className="min-h-full flex flex-col overflow-x-hidden">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

@@ -262,11 +262,6 @@
   ],
   "sessions": [
     {
-      "token": "9be8e90ad3114dc6efebce8872ce2c5d4d8c96997e8c3b597ab84c81172fc98d",
-      "userId": "usr_1794568062597_ku09",
-      "expiresAt": "2026-12-13T11:07:42.608Z"
-    },
-    {
       "token": "bc5fefab40a7c45706b6dac77b46ca0bac5580e1bef14bcdddc876514002eb80",
       "userId": "admin_1",
       "expiresAt": "2026-12-13T11:40:33.557Z"
