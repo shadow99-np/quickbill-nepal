@@ -8,11 +8,21 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultTab?: 'login' | 'signup';
+  initialTab?: 'login' | 'signup';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'login' }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'login', initialTab }) => {
+  const activeInitial = initialTab || defaultTab;
   const { login, signup } = useAuth();
-  const [tab, setTab] = useState<'login' | 'signup'>(defaultTab);
+  const [tab, setTab] = useState<'login' | 'signup'>(activeInitial);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setTab(initialTab || defaultTab);
+      setError(null);
+      setSuccess(null);
+    }
+  }, [isOpen, initialTab, defaultTab]);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -199,19 +209,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-              Email Address / ID *
+              {tab === 'login' ? 'Email Address or @Username *' : 'Email Address *'}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
               <input
-                type="email"
+                type={tab === 'login' ? 'text' : 'email'}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@business.com"
+                placeholder={tab === 'login' ? 'e.g. himalaya or name@business.com' : 'name@business.com'}
                 className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
+            {tab === 'login' && (
+              <p className="text-[11px] text-slate-400 mt-1">You can log in using either your email or your @username</p>
+            )}
           </div>
 
           <div>

@@ -4,7 +4,7 @@ import { getUserByEmail, createUser, hashPassword, createSession } from '@/lib/d
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, businessName, pan, phone, address } = body;
+    const { email, password, businessName, pan, phone, address, username } = body;
 
     if (!email || !password || !businessName) {
       return NextResponse.json(
@@ -28,14 +28,22 @@ export async function POST(request: Request) {
       );
     }
 
+    const finalUsername = (
+      username ||
+      email.split('@')[0] ||
+      businessName.toLowerCase().replace(/[^a-z0-9]/g, '')
+    ).trim().toLowerCase();
+
     const newUser = createUser({
       email: email.trim().toLowerCase(),
+      username: finalUsername,
       passwordHash: hashPassword(password),
       businessName: businessName.trim(),
       pan: (pan || '').trim(),
       phone: (phone || '').trim(),
       address: (address || '').trim(),
       role: 'user',
+      isPro: false,
     });
 
     const token = createSession(newUser.id);
@@ -46,6 +54,7 @@ export async function POST(request: Request) {
       user: {
         id: newUser.id,
         email: newUser.email,
+        username: newUser.username,
         businessName: newUser.businessName,
         pan: newUser.pan,
         phone: newUser.phone,

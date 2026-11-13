@@ -57,6 +57,14 @@ export default function AdminPage() {
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
+  // Pro Granting by Identifier State
+  const [grantIdentifier, setGrantIdentifier] = useState('');
+  const [grantDuration, setGrantDuration] = useState('12');
+  const [isGrantingPro, setIsGrantingPro] = useState(false);
+  const [grantSuccessMsg, setGrantSuccessMsg] = useState<string | null>(null);
+  const [grantErrorMsg, setGrantErrorMsg] = useState<string | null>(null);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+
   useEffect(() => {
     const saved = localStorage.getItem('quickbill_admin_token');
     if (saved) {
@@ -251,6 +259,43 @@ export default function AdminPage() {
       }
     } catch (err) {
       alert('Toggle failed');
+    }
+  };
+
+  const handleGrantProByIdentifier = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminToken || !grantIdentifier.trim()) return;
+    setIsGrantingPro(true);
+    setGrantSuccessMsg(null);
+    setGrantErrorMsg(null);
+
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          identifier: grantIdentifier.trim(),
+          durationMonths: Number(grantDuration),
+        }),
+      });
+
+      const data = await res.json();
+      setIsGrantingPro(false);
+
+      if (data.success && data.user) {
+        setGrantSuccessMsg(data.message || `Pro successfully activated for ${data.user.email}!`);
+        setGrantIdentifier('');
+        loadAdminData(adminToken);
+        setTimeout(() => setGrantSuccessMsg(null), 6000);
+      } else {
+        setGrantErrorMsg(data.error || 'Failed to activate Pro');
+      }
+    } catch (err) {
+      setIsGrantingPro(false);
+      setGrantErrorMsg('Network error while granting Pro');
     }
   };
 
@@ -743,7 +788,7 @@ export default function AdminPage() {
 
         {/* TAB 4: BUSINESSES & PRO MANAGEMENT */}
         {activeTab === 'users' && (
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
             <div className="pb-3 border-b border-slate-800 flex justify-between items-center">
               <div>
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -751,9 +796,109 @@ export default function AdminPage() {
                   <span>Registered Businesses &amp; Pro Access Control</span>
                 </h2>
                 <p className="text-xs text-slate-400">
-                  View merchant registrations, verify PANs, and grant 1-click Pro memberships
+                  Search accounts, grant Pro memberships by username/email, and verify merchant records
                 </p>
               </div>
+            </div>
+
+            {/* Quick Pro Activation by Identifier Card */}
+            <div className="p-4 bg-slate-950 rounded-xl border border-amber-500/30 shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                    <Crown className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">Grant Pro Subscription by Username or Email</h3>
+                    <p className="text-[11px] text-slate-400">
+                      Instantly activate ad-free Pro access for a customer using their login email, username, or business name
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {grantSuccessMsg && (
+                <div className="p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-lg text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{grantSuccessMsg}</span>
+                </div>
+              )}
+
+              {grantErrorMsg && (
+                <div className="p-3 bg-rose-950/60 border border-rose-500/40 rounded-lg text-rose-300 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{grantErrorMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleGrantProByIdentifier} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                <div className="sm:col-span-6">
+                  <label className="block text-[11px] font-semibold text-slate-300 uppercase mb-1">
+                    User Email, Username, or Business Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={grantIdentifier}
+                    onChange={(e) => setGrantIdentifier(e.target.value)}
+                    placeholder="e.g. himalaya@studio.np or himalayan_studio"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  />
+                </div>
+
+                <div className="sm:col-span-3">
+                  <label className="block text-[11px] font-semibold text-slate-300 uppercase mb-1">
+                    Plan Duration
+                  </label>
+                  <select
+                    value={grantDuration}
+                    onChange={(e) => setGrantDuration(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs font-semibold focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  >
+                    <option value="1">1 Month (रु. 199)</option>
+                    <option value="3">3 Months (रु. 549)</option>
+                    <option value="6">6 Months (रु. 999)</option>
+                    <option value="12">1 Year (रु. 1,999)</option>
+                    <option value="0">Lifetime Pro (Forever)</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-3">
+                  <button
+                    type="submit"
+                    disabled={isGrantingPro}
+                    className="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5"
+                  >
+                    {isGrantingPro ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Crown className="w-3.5 h-3.5 fill-slate-950" />
+                    )}
+                    <span>Activate Pro Access</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Search Filter */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+              <input
+                type="text"
+                value={userSearchTerm}
+                onChange={(e) => setUserSearchTerm(e.target.value)}
+                placeholder="Search registered businesses by name, username, email, or PAN..."
+                className="w-full sm:max-w-md px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs placeholder:text-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              />
+              <span className="text-[11px] text-slate-400 font-mono">
+                {stats?.users
+                  ? `Showing ${(stats.users || []).filter((u: any) =>
+                      u.businessName?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                      u.email?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                      u.username?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                      u.pan?.includes(userSearchTerm)
+                    ).length} of ${stats.users.length} accounts`
+                  : ''}
+              </span>
             </div>
 
             <div className="border border-slate-800 rounded-xl overflow-hidden">
@@ -761,46 +906,69 @@ export default function AdminPage() {
                 <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Business Entity</th>
-                    <th className="py-2.5 px-4 font-semibold">Email / ID</th>
+                    <th className="py-2.5 px-4 font-semibold">Username / Email</th>
                     <th className="py-2.5 px-4 font-semibold">PAN</th>
-                    <th className="py-2.5 px-4 font-semibold">Mobile</th>
+                    <th className="py-2.5 px-4 font-semibold">Cloud Data</th>
                     <th className="py-2.5 px-4 font-semibold text-center">Pro Status</th>
                     <th className="py-2.5 px-4 font-semibold text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800 font-mono text-slate-300">
                   {stats?.users && stats.users.length > 0 ? (
-                    stats.users.map((u: any) => (
-                      <tr key={u.id} className="hover:bg-slate-800/40">
-                        <td className="py-2.5 px-4 font-bold font-sans text-white">{u.businessName}</td>
-                        <td className="py-2.5 px-4">{u.email}</td>
-                        <td className="py-2.5 px-4 text-emerald-400">{u.pan || '—'}</td>
-                        <td className="py-2.5 px-4">{u.phone || '—'}</td>
-                        <td className="py-2.5 px-4 text-center">
-                          {u.isPro ? (
-                            <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase border border-amber-500/30">
-                              ★ PRO
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px]">
-                              Free
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-2.5 px-4 text-right">
-                          <button
-                            onClick={() => handleToggleUserPro(u.id, u.isPro)}
-                            className={`px-2.5 py-1 rounded text-xs font-bold transition-colors ${
-                              u.isPro
-                                ? 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30'
-                                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                            }`}
-                          >
-                            {u.isPro ? 'Revoke Pro' : 'Grant Pro'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                    (stats.users || [])
+                      .filter((u: any) =>
+                        u.businessName?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                        u.email?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                        u.username?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                        u.pan?.includes(userSearchTerm)
+                      )
+                      .map((u: any) => (
+                        <tr key={u.id} className="hover:bg-slate-800/40">
+                          <td className="py-2.5 px-4">
+                            <span className="font-bold font-sans text-white block">{u.businessName}</span>
+                            {u.phone && <span className="text-[10px] text-slate-400 font-mono">Ph: {u.phone}</span>}
+                          </td>
+                          <td className="py-2.5 px-4">
+                            <span className="text-amber-400/90 font-mono text-[11px] block">@{u.username || u.email.split('@')[0]}</span>
+                            <span className="text-[10px] text-slate-400 font-sans">{u.email}</span>
+                          </td>
+                          <td className="py-2.5 px-4 text-emerald-400">{u.pan || '—'}</td>
+                          <td className="py-2.5 px-4 text-slate-400 text-[11px]">
+                            <span>{u.invoicesCount || 0} bills</span>
+                            {u.clientsCount > 0 && <span className="ml-1 text-slate-500">• {u.clientsCount} clients</span>}
+                          </td>
+                          <td className="py-2.5 px-4 text-center">
+                            {u.isPro ? (
+                              <div className="inline-flex flex-col items-center">
+                                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase border border-amber-500/30">
+                                  ★ PRO
+                                </span>
+                                {u.proExpiresAt && (
+                                  <span className="text-[9px] text-amber-400/70 mt-0.5 font-mono">
+                                    till {u.proExpiresAt.split('T')[0]}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px]">
+                                Free
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-right">
+                            <button
+                              onClick={() => handleToggleUserPro(u.id, u.isPro)}
+                              className={`px-2.5 py-1 rounded text-xs font-bold transition-colors ${
+                                u.isPro
+                                  ? 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30'
+                                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                              }`}
+                            >
+                              {u.isPro ? 'Revoke Pro' : 'Grant Pro'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
                   ) : (
                     <tr>
                       <td colSpan={6} className="py-6 text-center text-slate-500">

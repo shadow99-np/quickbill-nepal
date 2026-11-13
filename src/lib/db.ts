@@ -1,17 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { InvoiceData } from '@/types/invoice';
+import { InvoiceData, ClientProfile, PaymentDetails } from '@/types/invoice';
 
 export interface UserAccount {
   id: string;
   email: string;
+  username?: string;
   passwordHash: string;
   businessName: string;
   pan: string;
   phone: string;
   address: string;
   logoUrl?: string;
+  payment?: PaymentDetails;
+  clients?: ClientProfile[];
+  defaultNotes?: string;
+  defaultTerms?: string;
   role: 'user' | 'admin';
   isPro?: boolean;
   proExpiresAt?: string;
@@ -198,6 +203,85 @@ export function saveDb(data: DatabaseSchema): void {
 export function getUserByEmail(email: string): UserAccount | null {
   const db = ensureDb();
   return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim()) || null;
+}
+
+export function getUserByEmailOrUsername(identifier: string): UserAccount | null {
+  const db = ensureDb();
+  const cleaned = identifier.toLowerCase().trim().replace(/^@/, '');
+  return (
+    db.users.find(
+      (u) =>
+        u.email.toLowerCase() === cleaned ||
+        (u.username && u.username.toLowerCase() === cleaned) ||
+        u.email.split('@')[0].toLowerCase() === cleaned ||
+        u.businessName.toLowerCase() === cleaned
+    ) || null
+  );
+}
+
+export function grantUserProByIdentifier(
+  identifier: string,
+  durationMonths: number = 12
+): { success: boolean; user?: UserAccount; error?: string } {
+  const db = ensureDb();
+  const cleaned = identifier.toLowerCase().trim().replace(/^@/, '');
+  const user = db.users.find(
+    (u) =>
+      u.email.toLowerCase() === cleaned ||
+      (u.username && u.username.toLowerCase() === cleaned) ||
+      u.email.split('@')[0].toLowerCase() === cleaned ||
+      u.businessName.toLowerCase() === cleaned
+  );
+  if (!user) {
+    return {
+      success: false,
+      error: `No business user found matching "${identifier}". Check email, username, or business name.`,
+    };
+  }
+
+  user.isPro = true;
+  if (durationMonths === 0) {
+    // Lifetime Pro (100 years)
+    user.proExpiresAt = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString();
+  } else {
+    const baseDate =
+      user.proExpiresAt && new Date(user.proExpiresAt) > new Date()
+        ? new Date(user.proExpiresAt).getTime()
+        : Date.now();
+    user.proExpiresAt = new Date(baseDate + durationMonths * 30 * 24 * 60 * 60 * 1000).toISOString();
+  }
+  user.updatedAt = new Date().toISOString();
+  saveDb(db);
+  return { success: true, user };
+}
+
+export function saveUserClient(userId: string, client: ClientProfile): ClientProfile[] {
+  const db = ensureDb();
+  const user = db.users.find((u) => u.id === userId);
+  if (!user) return [];
+  if (!user.clients) user.clients = [];
+
+  const existingIdx = user.clients.findIndex(
+    (c) =>
+      (client.pan && c.pan && client.pan.trim() === c.pan.trim()) ||
+      (client.name && c.name.toLowerCase().trim() === client.name.toLowerCase().trim())
+  );
+
+  if (existingIdx >= 0) {
+    user.clients[existingIdx] = { ...user.clients[existingIdx], ...client };
+  } else if (client.name && client.name.trim()) {
+    user.clients.unshift(client);
+  }
+
+  user.updatedAt = new Date().toISOString();
+  saveDb(db);
+  return user.clients;
+}
+
+export function getUserClients(userId: string): ClientProfile[] {
+  const db = ensureDb();
+  const user = db.users.find((u) => u.id === userId);
+  return user?.clients || [];
 }
 
 export function getUserById(id: string): UserAccount | null {
@@ -401,10 +485,14 @@ export function getAdminStats() {
     users: db.users.map((u) => ({
       id: u.id,
       email: u.email,
+      username: u.username || u.email.split('@')[0],
       businessName: u.businessName,
       pan: u.pan,
       phone: u.phone,
       isPro: !!u.isPro,
+      proExpiresAt: u.proExpiresAt,
+      invoicesCount: db.invoices.filter((inv) => inv.userId === u.id).length,
+      clientsCount: (u.clients || []).length,
       createdAt: u.createdAt,
     })),
     notifications: db.notifications,

@@ -17,12 +17,17 @@ import {
   Sparkles,
   ImageIcon,
   Loader2,
-  Package
+  Package,
+  Users,
+  Check,
+  Cloud,
+  BookOpen
 } from 'lucide-react';
-import { InvoiceData, InvoiceItem, PaymentMethod } from '@/types/invoice';
+import { InvoiceData, InvoiceItem, PaymentMethod, ClientProfile } from '@/types/invoice';
 import { formatNPR } from '@/utils/numberToWords';
 import { compressImage } from '@/utils/imageCompressor';
 import { saveBusinessProfile, getSavedBusinessProfile } from '@/utils/storage';
+import { useAuth } from '@/context/AuthContext';
 
 interface InvoiceFormProps {
   invoice: InvoiceData;
@@ -31,10 +36,16 @@ interface InvoiceFormProps {
 }
 
 export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onChange, onOpenCatalog }) => {
+  const { user, token, updateProfile } = useAuth();
   const [isCompressingLogo, setIsCompressingLogo] = useState(false);
   const [isCompressingQr, setIsCompressingQr] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [hasSavedProfile, setHasSavedProfile] = useState(false);
+
+  // Client directory state (Cloud-synced & Local fallback)
+  const [savedClients, setSavedClients] = useState<ClientProfile[]>([]);
+  const [showClientPicker, setShowClientPicker] = useState(false);
+  const [clientSavedSuccess, setClientSavedSuccess] = useState(false);
 
   useEffect(() => {
     const profile = getSavedBusinessProfile();
@@ -43,16 +54,109 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onChange, onO
     }
   }, []);
 
-  // Save current seller details as default
+  // Fetch or load clients
+  useEffect(() => {
+    if (token) {
+      fetch('/api/user/clients', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.clients && Array.isArray(data.clients)) {
+            setSavedClients(data.clients);
+          }
+        })
+        .catch(() => {});
+    } else {
+      try {
+        const local = localStorage.getItem('quickbill_clients');
+        if (local) {
+          setSavedClients(JSON.parse(local));
+        }
+      } catch (e) {}
+    }
+  }, [token, user]);
+
+  // Save current seller details as default (Local + Cloud Sync)
   const handleSaveDefaultProfile = () => {
     if (!invoice.issuer.name && !invoice.issuer.pan) {
       alert('Please fill in at least your Business Name or PAN before saving as default.');
       return;
     }
     saveBusinessProfile(invoice.issuer, invoice.payment);
+
+    // Sync to cloud database if logged in
+    if (user && token) {
+      updateProfile({
+        businessName: invoice.issuer.name,
+        pan: invoice.issuer.pan,
+        phone: invoice.issuer.phone,
+        address: invoice.issuer.address,
+        logoUrl: invoice.issuer.logoUrl,
+        payment: invoice.payment,
+      });
+    }
+
     setSavedSuccess(true);
     setHasSavedProfile(true);
     setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  // Save current client to directory (Local + Cloud Sync)
+  const handleSaveClientToDirectory = async () => {
+    if (!invoice.client.name.trim()) {
+      alert('Please enter a Customer / Organization Name first.');
+      return;
+    }
+    const clientToSave: ClientProfile = {
+      name: invoice.client.name.trim(),
+      pan: invoice.client.pan?.trim() || '',
+      phone: invoice.client.phone?.trim() || '',
+      email: invoice.client.email?.trim() || '',
+      address: invoice.client.address?.trim() || '',
+    };
+
+    if (token) {
+      try {
+        const res = await fetch('/api/user/clients', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ client: clientToSave }),
+        });
+        const data = await res.json();
+        if (data.clients) {
+          setSavedClients(data.clients);
+        }
+      } catch (e) {}
+    } else {
+      try {
+        const existing: ClientProfile[] = JSON.parse(localStorage.getItem('quickbill_clients') || '[]');
+        const filtered = existing.filter(c => c.name.toLowerCase() !== clientToSave.name.toLowerCase());
+        const updated = [clientToSave, ...filtered];
+        localStorage.setItem('quickbill_clients', JSON.stringify(updated));
+        setSavedClients(updated);
+      } catch (e) {}
+    }
+
+    setClientSavedSuccess(true);
+    setTimeout(() => setClientSavedSuccess(false), 2500);
+  };
+
+  const handleSelectClient = (client: ClientProfile) => {
+    onChange({
+      ...invoice,
+      client: {
+        name: client.name,
+        pan: client.pan || '',
+        phone: client.phone || '',
+        email: client.email || '',
+        address: client.address || '',
+      }
+    });
+    setShowClientPicker(false);
   };
 
   // Restore saved default profile
@@ -431,17 +535,91 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onChange, onO
       </div>
 
       {/* SECTION 2: BILL TO (CLIENT DETAILS) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4 relative">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2">
             <span className="w-6 h-6 rounded bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
               2
             </span>
             <h2 className="font-bold text-slate-900 text-base">Bill To (Client / Customer)</h2>
           </div>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Purchaser Details
-          </span>
+
+          <div className="flex items-center gap-2">
+            {/* Pick Saved Client */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowClientPicker(!showClientPicker)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
+              >
+                <Users className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Saved Clients ({savedClients.length})</span>
+              </button>
+
+              {/* Client Picker Dropdown */}
+              {showClientPicker && (
+                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-xl border border-slate-200 shadow-xl z-30 p-3 max-h-72 overflow-y-auto">
+                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+                      Client Directory
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowClientPicker(false)}
+                      className="text-xs text-slate-400 hover:text-slate-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {savedClients.length === 0 ? (
+                    <div className="py-4 text-center text-xs text-slate-500">
+                      No saved clients yet.<br />
+                      Fill customer details and click <strong>"Save to Directory"</strong> below.
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {savedClients.map((client, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => handleSelectClient(client)}
+                          className="p-2 rounded-lg hover:bg-emerald-50 border border-transparent hover:border-emerald-200 cursor-pointer transition-all text-left"
+                        >
+                          <div className="font-bold text-xs text-slate-900">{client.name}</div>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                            {client.pan && <span>PAN: {client.pan}</span>}
+                            {client.phone && <span>• {client.phone}</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Save Current Client to Directory */}
+            <button
+              type="button"
+              onClick={handleSaveClientToDirectory}
+              disabled={!invoice.client.name.trim()}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-colors disabled:opacity-40"
+              title="Save this client to your directory (cloud-synced across your devices)"
+            >
+              {clientSavedSuccess ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Saved!</span>
+                </>
+              ) : (
+                <>
+                  <Cloud className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Save Client</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

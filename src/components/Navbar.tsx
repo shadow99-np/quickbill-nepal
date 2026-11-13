@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Zap,
   Printer,
@@ -17,7 +18,8 @@ import {
   Bell,
   ChevronDown,
   Building2,
-  Crown
+  Crown,
+  Home as HomeIcon
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationBellButton } from './NotificationFeed';
@@ -60,14 +62,23 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="no-print flex justify-between items-center w-full px-3 sm:px-6 lg:px-8 h-16 sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
       {/* Left: Brand & Document Status Cluster */}
       <div className="flex items-center space-x-2 sm:space-x-4">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-sm shrink-0">
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-emerald-600 group-hover:bg-emerald-700 flex items-center justify-center text-white shadow-sm shrink-0 transition-colors">
             <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
           </div>
-          <span className="text-base sm:text-xl font-bold text-slate-900 tracking-tight">
+          <span className="text-base sm:text-xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors">
             QuickBill <span className="text-emerald-600">Nepal</span>
           </span>
-        </div>
+        </Link>
+
+        <Link
+          href="/"
+          className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 rounded-lg border border-slate-200 transition-colors"
+          title="Return to Website Home Page"
+        >
+          <HomeIcon className="w-3.5 h-3.5" />
+          <span>Home</span>
+        </Link>
 
         <div className="h-5 w-[1px] bg-slate-200 hidden md:block"></div>
 

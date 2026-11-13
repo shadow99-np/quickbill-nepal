@@ -18,6 +18,7 @@ interface AuthContextType {
   }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateProfile: (updates: Partial<UserAccount>) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -122,6 +123,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfile = async (updates: Partial<UserAccount>): Promise<boolean> => {
+    if (!token) return false;
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        setUser(data.user);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -132,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signup,
         logout,
         refreshUser,
+        updateProfile,
       }}
     >
       {children}
