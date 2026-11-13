@@ -334,6 +334,11 @@
       "token": "53aaf5ce54fb0e092102588fdae0c4c90eecadbf115fc9a2996fb44bf73d5be7",
       "userId": "admin_1",
       "expiresAt": "2026-12-13T14:44:37.087Z"
+    },
+    {
+      "token": "3e04bc3bdb9555b9eb712d7370d2dfaa3a69979a61d47c45f5962332a293f84d",
+      "userId": "admin_1",
+      "expiresAt": "2026-12-13T14:48:40.530Z"
     }
   ],
   "settings": {
@@ -342,7 +347,9 @@
     "adsEnabled": true,
     "proPriceMonthlyNpr": 199,
     "proPriceYearlyNpr": 1999,
-    "adminEsewaId": "9801234567",
+    "adminEsewaId": "9761033755",
+    "adminEsewaName": "Pushkar Nepal",
+    "adminEsewaQr": "/images/esewa_pro_qr.jpg",
     "fiscalYear": "2081/82"
   }
 }

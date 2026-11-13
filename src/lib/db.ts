@@ -32,6 +32,8 @@ export interface AppSettings {
   proPriceYearlyNpr: number;
   adminFonepayQr?: string;
   adminEsewaId?: string;
+  adminEsewaName?: string;
+  adminEsewaQr?: string;
   fiscalYear: string;
 }
 
@@ -150,7 +152,9 @@ const INITIAL_DB: DatabaseSchema = {
     adsEnabled: true,
     proPriceMonthlyNpr: 199,
     proPriceYearlyNpr: 1999,
-    adminEsewaId: '9801234567',
+    adminEsewaId: '9761033755',
+    adminEsewaName: 'Pushkar Nepal',
+    adminEsewaQr: '/images/esewa_pro_qr.jpg',
     fiscalYear: '2081/82',
   }
 };
