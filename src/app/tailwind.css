@@ -1062,6 +1062,9 @@
       background-color: color-mix(in oklab, var(--color-amber-500) 20%, transparent);
     }
   }
+  .bg-amber-600 {
+    background-color: var(--color-amber-600);
+  }
   .bg-blue-50\/70 {
     background-color: color-mix(in srgb, oklch(97% 0.014 254.604) 70%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1989,6 +1992,9 @@
     }
     .hover\:bg-amber-200:hover {
       background-color: var(--color-amber-200);
+    }
+    .hover\:bg-amber-500:hover {
+      background-color: var(--color-amber-500);
     }
     .hover\:bg-blue-600:hover {
       background-color: var(--color-blue-600);

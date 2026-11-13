@@ -65,6 +65,13 @@ export default function AdminPage() {
   const [grantErrorMsg, setGrantErrorMsg] = useState<string | null>(null);
   const [userSearchTerm, setUserSearchTerm] = useState('');
 
+  // Change Admin Password State
+  const [newAdminPass, setNewAdminPass] = useState('');
+  const [confirmAdminPass, setConfirmAdminPass] = useState('');
+  const [passChangeSuccess, setPassChangeSuccess] = useState<string | null>(null);
+  const [passChangeError, setPassChangeError] = useState<string | null>(null);
+  const [isChangingPass, setIsChangingPass] = useState(false);
+
   useEffect(() => {
     const saved = localStorage.getItem('quickbill_admin_token');
     if (saved) {
@@ -296,6 +303,46 @@ export default function AdminPage() {
     } catch (err) {
       setIsGrantingPro(false);
       setGrantErrorMsg('Network error while granting Pro');
+    }
+  };
+
+  const handleChangeAdminPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPassChangeSuccess(null);
+    setPassChangeError(null);
+
+    if (newAdminPass.length < 6) {
+      setPassChangeError('Password must be at least 6 characters long.');
+      return;
+    }
+    if (newAdminPass !== confirmAdminPass) {
+      setPassChangeError('Passwords do not match.');
+      return;
+    }
+
+    setIsChangingPass(true);
+    try {
+      const res = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ newPassword: newAdminPass }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPassChangeSuccess('Admin master password updated successfully!');
+        setNewAdminPass('');
+        setConfirmAdminPass('');
+        setTimeout(() => setPassChangeSuccess(null), 4000);
+      } else {
+        setPassChangeError(data.error || 'Failed to update admin password.');
+      }
+    } catch (err) {
+      setPassChangeError('Network error while updating password.');
+    } finally {
+      setIsChangingPass(false);
     }
   };
 
@@ -783,6 +830,76 @@ export default function AdminPage() {
                 <span>Save All Monetization Settings</span>
               </button>
             </form>
+
+            {/* Admin Security: Change Password Card */}
+            <div className="pt-6 border-t border-slate-800 max-w-2xl">
+              <div className="pb-3">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-400" />
+                  <span>Update Admin Portal Password</span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Change the master secret password used to access this admin portal
+                </p>
+              </div>
+
+              <form onSubmit={handleChangeAdminPassword} className="space-y-4">
+                {passChangeSuccess && (
+                  <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs rounded-xl flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span>{passChangeSuccess}</span>
+                  </div>
+                )}
+
+                {passChangeError && (
+                  <div className="p-3 bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs rounded-xl flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-400" />
+                    <span>{passChangeError}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                      New Admin Password *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={newAdminPass}
+                      onChange={(e) => setNewAdminPass(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                      Confirm New Password *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={confirmAdminPass}
+                      onChange={(e) => setConfirmAdminPass(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isChangingPass}
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center gap-2"
+                >
+                  {isChangingPass ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Lock className="w-3.5 h-3.5" />}
+                  <span>Update Admin Password</span>
+                </button>
+              </form>
+            </div>
           </section>
         )}
 

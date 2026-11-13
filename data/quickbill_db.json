@@ -3,14 +3,14 @@
     {
       "id": "admin_1",
       "email": "admin@quickbillnepal.com",
-      "passwordHash": "58c39a1fccf03f26318f428d2c21df5c27cad658a07e94a12b09b2d0d97b65dd",
+      "passwordHash": "0efd0b98d1bd18eec451fd4ae35b3a4aef7c45a33f2f0ce9913c844f9777aed8",
       "businessName": "QuickBill Nepal Admin Desk",
       "pan": "100000001",
       "phone": "+977 9801234567",
       "address": "Putalisadak, Kathmandu",
       "role": "admin",
       "createdAt": "2026-11-13T10:59:11.348Z",
-      "updatedAt": "2026-11-13T10:59:11.348Z"
+      "updatedAt": "2026-11-13T14:46:39.921Z"
     },
     {
       "email": "himalaya@studio.np",
@@ -56,6 +56,20 @@
       "id": "usr_1794571351505_fpt8",
       "createdAt": "2026-11-13T12:02:31.505Z",
       "updatedAt": "2026-11-13T12:02:31.505Z"
+    },
+    {
+      "email": "shadowawake99@gmail.com",
+      "username": "shadowawake99",
+      "passwordHash": "adfd147a48044198d576956eab86cc8f766c359bb387db47ee1cf37292ccb98f",
+      "businessName": "To ffr",
+      "pan": "",
+      "phone": "9761033755",
+      "address": "Trfr",
+      "role": "user",
+      "isPro": false,
+      "id": "usr_1794576814392_srru",
+      "createdAt": "2026-11-13T13:33:34.392Z",
+      "updatedAt": "2026-11-13T13:33:34.392Z"
     }
   ],
   "invoices": [
@@ -310,6 +324,16 @@
       "token": "2d3f46cb98baa65a09686596397f54971e525e296f505db5a3ce76a524e0fde9",
       "userId": "usr_1794568062597_ku09",
       "expiresAt": "2026-12-13T12:35:48.357Z"
+    },
+    {
+      "token": "9720366f1954a167e4f06b33d8b81468c2c546114fc533d61b7c8c034b64e55f",
+      "userId": "usr_1794576814392_srru",
+      "expiresAt": "2026-12-13T13:33:34.407Z"
+    },
+    {
+      "token": "53aaf5ce54fb0e092102588fdae0c4c90eecadbf115fc9a2996fb44bf73d5be7",
+      "userId": "admin_1",
+      "expiresAt": "2026-12-13T14:44:37.087Z"
     }
   ],
   "settings": {

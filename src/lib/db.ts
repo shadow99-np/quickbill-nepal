@@ -498,3 +498,14 @@ export function getAdminStats() {
     notifications: db.notifications,
   };
 }
+
+export function updateAdminPassword(newPassword: string): boolean {
+  const db = ensureDb();
+  const adminIndex = db.users.findIndex((u) => u.role === 'admin' || u.id === 'admin_1');
+  if (adminIndex === -1) return false;
+  db.users[adminIndex].passwordHash = hashPassword(newPassword);
+  db.users[adminIndex].updatedAt = new Date().toISOString();
+  saveDb(db);
+  return true;
+}
+
