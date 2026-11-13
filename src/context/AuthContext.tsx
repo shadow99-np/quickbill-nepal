@@ -1,0 +1,148 @@
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { UserAccount } from '@/lib/db';
+
+interface AuthContextType {
+  user: UserAccount | null;
+  token: string | null;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (data: {
+    email: string;
+    password: string;
+    businessName: string;
+    pan?: string;
+    phone?: string;
+    address?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
+  logout: () => void;
+  refreshUser: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserAccount | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchCurrentUser = async (authToken: string) => {
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const data = await res.json();
+      if (data.user) {
+        setUser(data.user);
+      } else {
+        localStorage.removeItem('quickbill_token');
+        setToken(null);
+        setUser(null);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch user', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem('quickbill_token');
+    if (savedToken) {
+      setToken(savedToken);
+      fetchCurrentUser(savedToken);
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Login failed' };
+      }
+      localStorage.setItem('quickbill_token', data.token);
+      setToken(data.token);
+      setUser(data.user);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const signup = async (formData: {
+    email: string;
+    password: string;
+    businessName: string;
+    pan?: string;
+    phone?: string;
+    address?: string;
+  }) => {
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Signup failed' };
+      }
+      localStorage.setItem('quickbill_token', data.token);
+      setToken(data.token);
+      setUser(data.user);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const logout = () => {
+    if (token) {
+      fetch('/api/auth/me', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+    localStorage.removeItem('quickbill_token');
+    setToken(null);
+    setUser(null);
+  };
+
+  const refreshUser = async () => {
+    if (token) {
+      await fetchCurrentUser(token);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isLoading,
+        login,
+        signup,
+        logout,
+        refreshUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

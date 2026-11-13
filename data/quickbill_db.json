@@ -1,0 +1,196 @@
+{
+  "users": [
+    {
+      "id": "admin_1",
+      "email": "admin@quickbillnepal.com",
+      "passwordHash": "58c39a1fccf03f26318f428d2c21df5c27cad658a07e94a12b09b2d0d97b65dd",
+      "businessName": "QuickBill Nepal Admin Desk",
+      "pan": "100000001",
+      "phone": "+977 9801234567",
+      "address": "Putalisadak, Kathmandu",
+      "role": "admin",
+      "createdAt": "2026-11-13T10:59:11.348Z",
+      "updatedAt": "2026-11-13T10:59:11.348Z"
+    },
+    {
+      "email": "himalaya@studio.np",
+      "passwordHash": "153903565b4ceb11ca2becd8be8d8707e7a22ab5b23085aedf4c2ee4349a8590",
+      "businessName": "Himalayan Studio Nepal",
+      "pan": "601234567",
+      "phone": "9841234567",
+      "address": "Thamel, Kathmandu",
+      "role": "user",
+      "id": "usr_1794568062597_ku09",
+      "createdAt": "2026-11-13T11:07:42.597Z",
+      "updatedAt": "2026-11-13T11:43:29.608Z",
+      "isPro": true,
+      "proExpiresAt": "2027-11-13T11:43:29.608Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv_1794566832395",
+      "userId": "usr_1794568062597_ku09",
+      "invoiceNumber": "QB-2081-0001",
+      "invoice": {
+        "id": "inv_1794566832395",
+        "invoiceNumber": "QB-2081-0001",
+        "fiscalYear": "2081/82",
+        "invoiceDateBS": "2081/08/28",
+        "invoiceDateAD": "2026-11-13",
+        "dueDate": "Due on Receipt",
+        "paymentTerms": "Due on Receipt",
+        "issuer": {
+          "name": "Shadow12",
+          "pan": "758678",
+          "phone": "867857888",
+          "email": "gyghcjjhjkll",
+          "address": "Biratchwok ",
+          "logoUrl": ""
+        },
+        "client": {
+          "name": "",
+          "pan": "",
+          "phone": "",
+          "email": "",
+          "address": ""
+        },
+        "items": [
+          {
+            "id": "item_1794568001005",
+            "description": "Website Design & Development Package",
+            "quantity": 1,
+            "rate": 35000,
+            "amount": 35000
+          }
+        ],
+        "subtotal": 35000,
+        "discount": 5250,
+        "hasVat": false,
+        "vatRate": 13,
+        "vatAmount": 0,
+        "grandTotal": 29750,
+        "amountInWords": "Zero Rupees Only",
+        "notes": "",
+        "termsAndConditions": "1. Goods once sold or services rendered are subject to standard delivery terms.\n2. Please quote invoice number when transferring funds.",
+        "payment": {
+          "method": "esewa",
+          "merchantId": "",
+          "phoneNumber": "",
+          "accountName": "",
+          "bankName": "",
+          "accountNumber": "",
+          "branchName": "",
+          "embedAmountInQr": true,
+          "customQrImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAJYAlgDASIAAhEBAxEB/8QAGwABAQEAAwEBAAAAAAAAAAAAAAcGBAUIAgP/xABIEAEAAQMDAwIDBQQFCAgHAAAAAQIDBAUGEQcSIRMxCBRBFSIyUWEWQnGBFxgkM2IjUnJ1gpSh0QkmNThTVJGyVVZzpcHS0//EABsBAQADAAMBAAAAAAAAAAAAAAABAwUCBAYI/8QALhEBAAICAgEDAwQBAwUAAAAAAAECAxEEIRIFMUEiUWETMnGBQiORoRQzsdHw/9oADAMBAAIRAxEAPwCdALXyOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/Z"
+        },
+        "status": "draft",
+        "discountType": "percentage",
+        "discountValue": 15,
+        "currency": "USD",
+        "currencySymbol": "$"
+      },
+      "createdAt": "2026-11-13",
+      "updatedAt": "2026-11-13T11:56:37.763Z"
+    }
+  ],
+  "catalog": [
+    {
+      "id": "cat_1",
+      "userId": "admin_1",
+      "name": "Professional Consulting / Advisory Service",
+      "rate": 5000,
+      "unit": "hr",
+      "category": "Services",
+      "createdAt": "2026-11-13T10:59:11.349Z"
+    },
+    {
+      "id": "cat_2",
+      "userId": "admin_1",
+      "name": "Website Design & Development Package",
+      "rate": 35000,
+      "unit": "project",
+      "category": "Software",
+      "createdAt": "2026-11-13T10:59:11.349Z"
+    },
+    {
+      "id": "cat_3",
+      "userId": "admin_1",
+      "name": "Commercial Photography & Editing Session",
+      "rate": 15000,
+      "unit": "session",
+      "category": "Creative",
+      "createdAt": "2026-11-13T10:59:11.349Z"
+    }
+  ],
+  "notifications": [
+    {
+      "title": "New update soon",
+      "message": "We are updating",
+      "type": "update",
+      "active": true,
+      "id": "notif_1794570565034",
+      "createdAt": "2026-11-13T11:49:25.034Z"
+    },
+    {
+      "title": "🚀 Welcome to QuickBill Nepal v2.0",
+      "message": "Real-time cloud backup, IRD Sales Register exports, and multi-device billing are now live for all Nepali businesses!",
+      "type": "update",
+      "active": true,
+      "id": "notif_1794570245255",
+      "createdAt": "2026-11-13T11:44:05.255Z"
+    },
+    {
+      "id": "notif_1",
+      "title": "🇳🇵 IRD Notice: Monthly VAT Return Filing",
+      "message": "Reminder for VAT-registered firms: VAT returns and tax payments must be filed by the 25th of every Nepali month.",
+      "type": "tax",
+      "active": false,
+      "createdAt": "2026-11-13T10:59:11.349Z"
+    },
+    {
+      "id": "notif_2",
+      "title": "✨ New Feature: Embedded Fonepay & eSewa QR Stands",
+      "message": "You can now upload your counter QR stand photo or auto-generate scan-to-pay QRs with exact NPR payable amounts.",
+      "type": "update",
+      "active": true,
+      "createdAt": "2026-11-13T10:59:11.349Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "9be8e90ad3114dc6efebce8872ce2c5d4d8c96997e8c3b597ab84c81172fc98d",
+      "userId": "usr_1794568062597_ku09",
+      "expiresAt": "2026-12-13T11:07:42.608Z"
+    },
+    {
+      "token": "bc5fefab40a7c45706b6dac77b46ca0bac5580e1bef14bcdddc876514002eb80",
+      "userId": "admin_1",
+      "expiresAt": "2026-12-13T11:40:33.557Z"
+    },
+    {
+      "token": "f4d4cb9997f315095bd38f8ef7c5f3379b905998a5e64e1fdcceff454ca331f4",
+      "userId": "admin_1",
+      "expiresAt": "2026-12-13T11:40:52.898Z"
+    },
+    {
+      "token": "40f85d9f020afc3814125cacdb7a5b3b9702a157847978b2ad702ea927b017dd",
+      "userId": "admin_1",
+      "expiresAt": "2026-12-13T11:41:05.997Z"
+    },
+    {
+      "token": "240fd84ccfa0ffbba093dddafa211e5b0989948a47c63d1b364d25a75d1d5b11",
+      "userId": "admin_1",
+      "expiresAt": "2026-12-13T11:48:14.535Z"
+    }
+  ],
+  "settings": {
+    "adsenseClientId": "",
+    "adsenseSlotId": "1234567890",
+    "adsEnabled": true,
+    "proPriceMonthlyNpr": 199,
+    "proPriceYearlyNpr": 1999,
+    "adminEsewaId": "9801234567",
+    "fiscalYear": "2081/82"
+  }
+}
