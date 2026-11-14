@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     'Nepali Freelancer Billing',
     'NPR Receipt Maker'
   ],
+  other: {
+    'google-adsense-account': 'ca-pub-4195575830261385',
+  },
 };
 
 export const viewport: Viewport = {
@@ -32,10 +35,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased overflow-x-hidden">
+      <head>
+        <meta name="google-adsense-account" content="ca-pub-4195575830261385" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4195575830261385"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-full flex flex-col overflow-x-hidden">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
 }
-

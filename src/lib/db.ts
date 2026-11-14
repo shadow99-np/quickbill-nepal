@@ -157,7 +157,7 @@ const INITIAL_DB: DatabaseSchema = {
   ],
   sessions: [],
   settings: {
-    adsenseClientId: process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || '',
+    adsenseClientId: process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-4195575830261385',
     adsenseSlotId: '1234567890',
     adsEnabled: true,
     proPriceMonthlyNpr: 199,
