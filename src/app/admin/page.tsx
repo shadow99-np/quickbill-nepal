@@ -97,14 +97,15 @@ export default function AdminPage() {
           setAdsEnabled(data.stats.settings.adsEnabled !== false);
           setProMonthly(data.stats.settings.proPriceMonthlyNpr || 199);
           setProYearly(data.stats.settings.proPriceYearlyNpr || 1999);
-          setAdminEsewa(data.stats.settings.adminEsewaId || '9801234567');
+          setAdminEsewa(data.stats.settings.adminEsewaId || '9761033755');
         }
-      } else {
+      } else if (res.status === 401 || res.status === 403) {
         localStorage.removeItem('quickbill_admin_token');
         setIsAdminLoggedIn(false);
+        setLoginError(data.error || 'Session expired. Please enter password again.');
       }
     } catch (e) {
-      setIsAdminLoggedIn(false);
+      console.error('Failed to load admin stats:', e);
     }
   };
 
@@ -125,13 +126,14 @@ export default function AdminPage() {
       if (data.success && data.token) {
         localStorage.setItem('quickbill_admin_token', data.token);
         setAdminToken(data.token);
-        loadAdminData(data.token);
+        setIsAdminLoggedIn(true);
+        await loadAdminData(data.token);
       } else {
         setLoginError(data.error || 'Invalid admin password');
       }
     } catch (err) {
       setIsLoggingIn(false);
-      setLoginError('Network error');
+      setLoginError('Network error connecting to admin service');
     }
   };
 

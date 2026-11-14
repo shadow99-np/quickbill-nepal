@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getUserByEmail, hashPassword, createSession } from '@/lib/db';
+import { getUserByEmail, getUserById, hashPassword, createSession } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Password required' }, { status: 400 });
     }
 
-    const admin = getUserByEmail('admin@quickbillnepal.com');
+    const admin = getUserByEmail('admin@quickbillnepal.com') || getUserById('admin_1');
     if (!admin) {
       return NextResponse.json({ error: 'Admin account not initialized' }, { status: 500 });
     }
